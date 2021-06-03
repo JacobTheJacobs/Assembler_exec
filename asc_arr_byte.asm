@@ -1,0 +1,44 @@
+DS1 SEGMENT    
+    
+LIST  DW  34H, 21H,13H,45H,54H
+N     DB  5
+FLAG  DB  0 
+
+DS1 ENDS
+         
+         
+SS1 SEGMENT
+DW 10H DUP(?)
+SS1 ENDS  
+        
+        
+CS1 SEGMENT
+ASSUME DS:DS1 ,SS:SS1 ,CS:CS1 
+
+START:  MOV AX,DS1
+        MOV DS,AX
+
+L0: MOV FLAG, 0
+    MOV CL, N
+    MOV CH, 0
+    DEC CX ;CX=N-1
+    MOV SI, OFFSET LIST
+
+L1: MOV DX, [SI]
+    CMP DX, [SI+1]  
+    JGE L2  ;JGE
+    XCHG [SI+1], DX
+    MOV [SI], DX 
+
+    MOV FLAG, 1
+
+L2: INC SI
+    LOOP L1
+    CMP FLAG, 0
+    JNE L0
+
+SOF: MOV AH, 4CH
+     INT 21H
+     CS1 ENDS     
+
+END START
